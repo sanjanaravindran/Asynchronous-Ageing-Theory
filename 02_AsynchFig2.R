@@ -9,11 +9,12 @@ set.seed(6385)
 df <- data.frame(z1 = rlnorm(n = 100), 
                  z2 = rlnorm(n = 100)) 
 
-#Here, we are saying that trait z1 is more strongly associated with age-specific fertility than trait z2 
+#Here, we are saying that trait z1 is more strongly associated with age-specific fertility (4x) than trait z2 
 mi <- round(.8*df$z1 + .2*df$z2,0)
 
 df <- cbind(df, mi)
 
+# Plot for Fig 2 A
 # Plotting the relationship between fertility and the phenotypic values
 plot1 <- pivot_longer(df, cols = c(z1, z2), names_to = "Trait", values_to = "Phenotype") %>%
   ggplot(aes(x = Phenotype, y = mi, colour = Trait)) +
@@ -35,23 +36,24 @@ plot1
 # Note: This simple illustration assumes that the age-specific fertility values we
 # previously obtained above dont need to add up to the population-level Mx values 
 # that go into the Leslie matrix 
-p <- rep(.8, 5)
+p <- rep(.8, 5)            #age-specific survival 
+#m <- rep(.3, mean(mi))    #age-specific fertility
 m <- rep(.3, mean(mi))     # These values were picked as they are age-invariant and result in a slightly positive growth rate
-A <- diag(p)
+A <- diag(p)           
 A <- cbind(A, rep(0,5))
-A <-rbind(m,A)
-r <- log(Re(eigen(A)$values[1]))  
-l<-c(1,cumprod(p))
-dr_dm <- l*exp(-r*seq(1,6))    ###Hamilton
+A <-rbind(m,A)              #Leslie Matrix
+r <- log(Re(eigen(A)$values[1]))  #intrinsic growth rate
+l<-c(1,cumprod(p))            #cumulative survival
+dr_dm <- l*exp(-r*seq(1,6))    # Hamilton fertility selection
 
-dm_dz1 <- lm(mi ~ z1, df)$coef[2]
+dm_dz1 <- lm(mi ~ z1, df)$coef[2]        
 dm_dz2 <- lm(mi ~ z2, df)$coef[2]
 
 df2 <- data.frame(Age = seq(1,6),
                   FertilitySelection = dr_dm,
                   z1 = dr_dm*dm_dz1,
                   z2 = dr_dm*dm_dz2)
-
+#Plot for Fig 2 B
 plot2 <- pivot_longer(df2, cols = c(z1, z2), names_to = "Trait", values_to = "PhenotypicSelection") %>%
   ggplot(aes(x = Age, y = PhenotypicSelection, colour = Trait)) +
   geom_point(size=2.5) +
