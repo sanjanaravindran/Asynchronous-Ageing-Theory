@@ -17,11 +17,12 @@ df <- cbind(df, mi)
 # Plotting the relationship between fertility and the phenotypic values
 plot1 <- pivot_longer(df, cols = c(z1, z2), names_to = "Trait", values_to = "Phenotype") %>%
   ggplot(aes(x = Phenotype, y = mi, colour = Trait)) +
-  geom_point(size=2) +
-  geom_smooth(method = "lm", se=FALSE, size=1.5) +
+  geom_point(aes(shape=Trait, colour=Trait),size=3) +
+  geom_smooth(method = "lm", se=FALSE, size=1.5, na.rm=T) +
   ylab("Fertility") +
   xlab("Phenotypic Value") +
-  scale_colour_manual(values = c("#CC6677", "#44AA99")) +
+  scale_shape_manual(values = c(16, 17)) +
+  scale_colour_manual(values = c("#878787", "#444444")) +
   theme_cowplot() + theme(legend.position = "none") +
   theme(axis.title.x = element_text(size = 20),
         axis.text.x = element_text(size = 18),
@@ -54,10 +55,11 @@ df2 <- data.frame(Age = seq(1,6),
 
 plot2 <- pivot_longer(df2, cols = c(z1, z2), names_to = "Trait", values_to = "PhenotypicSelection") %>%
   ggplot(aes(x = Age, y = PhenotypicSelection, colour = Trait)) +
-  geom_point(size=2.5) +
+  geom_point(aes(shape=Trait, colour=Trait),size=4) +
   geom_line(size=1.5) +
   ylab("Age-specific \nPhenotypic Selection") +
-  scale_colour_manual(values = c("#CC6677", "#44AA99")) +
+  scale_shape_manual(values = c(16, 17)) +
+  scale_colour_manual(values = c("#878787", "#444444")) +
   theme_cowplot() +
   theme(axis.title.x = element_text(size = 20),
     axis.text.x = element_text(size = 18),
@@ -65,7 +67,9 @@ plot2 <- pivot_longer(df2, cols = c(z1, z2), names_to = "Trait", values_to = "Ph
     axis.text.y = element_text(size = 18),
     legend.title=element_text(size=20), 
     legend.text=element_text(size=18)) +
-  scale_x_continuous(name="Age", limits=c(1, 6), breaks = c(seq(1,6)))
+  scale_x_continuous(name="Age", limits=c(1, 6), breaks = c(seq(1,6)))+
+  guides(fill = guide_legend(override.aes = list(linetype = 0)),
+         color = guide_legend(override.aes = list(linetype = 0)))
 
 plot2
 
