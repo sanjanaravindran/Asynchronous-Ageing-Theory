@@ -23,7 +23,7 @@ plot1 <- pivot_longer(df, cols = c(z1, z2), names_to = "Trait", values_to = "Phe
   ylab("Fertility") +
   xlab("Phenotypic Value") +
   scale_shape_manual(values = c(16, 17)) +
-  scale_colour_manual(values = c("#878787", "#444444")) +
+  scale_colour_manual(values = c("#656565", "#989898")) +
   theme_cowplot() + theme(legend.position = "none") +
   theme(axis.title.x = element_text(size = 20),
         axis.text.x = element_text(size = 18),
@@ -51,33 +51,41 @@ dm_dz1 <- lm(mi ~ z1, df)$coef[2]
 dm_dz2 <- lm(mi ~ z2, df)$coef[2]
 
 df2 <- data.frame(Age = seq(1,6),
-                  FertilitySelection = dr_dm,
+                  Fertility = dr_dm,
                   z1 = dr_dm*dm_dz1,
                   z2 = dr_dm*dm_dz2)
+
+lab1 <- c(expression(Fertility),
+          expression(z['1']), 
+          expression(z['2']))
+
 #Plot for Fig 2 B
-plot2 <- pivot_longer(df2, cols = c(z1, z2), names_to = "Trait", values_to = "PhenotypicSelection") %>%
-  ggplot(aes(x = Age, y = PhenotypicSelection, colour = Trait)) +
+plot2 <- pivot_longer(df2, cols = c(Fertility, z1, z2), names_to = "Trait", values_to = "Selection") %>%
+  ggplot(aes(x = Age, y = Selection, colour = Trait)) +
   geom_point(aes(shape=Trait, colour=Trait),size=4) +
   geom_line(size=1.5) +
-  ylab("Age-specific \nPhenotypic Selection") +
-  scale_shape_manual(values = c(16, 17)) +
-  scale_colour_manual(values = c("#878787", "#444444")) +
+  ylab("Age-specific Selection") +
+  scale_colour_manual(values = c("#000000","#656565", "#989898"), labels=lab1) +
+  scale_shape_manual(values = c(15, 16, 17), labels=lab1) +
   theme_cowplot() +
   theme(axis.title.x = element_text(size = 20),
     axis.text.x = element_text(size = 18),
     axis.title.y = element_text(size = 20),
     axis.text.y = element_text(size = 18),
     legend.title=element_text(size=20), 
-    legend.text=element_text(size=18)) +
+    legend.text=element_text(size=18),
+    legend.text.align = 0) +
   scale_x_continuous(name="Age", limits=c(1, 6), breaks = c(seq(1,6)))+
   guides(fill = guide_legend(override.aes = list(linetype = 0)),
-         color = guide_legend(override.aes = list(linetype = 0)))
+         color = guide_legend(override.aes = list(linetype = 0))) 
 
 plot2
 
 p_all <- ggarrange(plot1, plot2, 
                    labels = c("A", "B"),
-                   ncol = 2, nrow = 1)
+                   ncol = 2, nrow = 1, 
+                   widths = c(0.8, 1),
+                   align = "h")
 p_all
 
-ggsave("Async_Fig2.png", p_all, height = 5 , width = 11)
+ggsave("Async_Fig2.png", p_all, height = 5 , width = 12)
